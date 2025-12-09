@@ -24,9 +24,11 @@ def add_todo():
 def toggle_todo(id):
     todo = select_query('SELECT complete FROM todos WHERE id = %s', (id,))
     if todo:
-        new_status = not todo[0]['complete']
-        execute_query('UPDATE todos SET complete = %s WHERE id = %s', (new_status, id,))
-        
+        # Convert to integer (0 or 1) for MySQL compatibility
+        current_status = todo[0]['complete']
+        new_status = 0 if current_status else 1
+        execute_query('UPDATE todos SET complete = %s WHERE id = %s', (new_status, id))
+
     return redirect(url_for('index'))
 
 @app.route('/delete/<int:id>', methods=['POST'])
